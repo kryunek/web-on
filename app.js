@@ -952,29 +952,49 @@ function renderStockAlerts() {
 
 // --- STAFF/TASKS (sin cambios importantes) ---
 function renderEmployeesTable() {
-  const tbody = document.getElementById('employeesBody'); if(!tbody) return; tbody.innerHTML = "";
-  if (employees.length === 0) { tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:28px 0">No hay empleados.</td></tr>`; updateTaskEmployeeSelect(); return; }
+  const tbody = document.getElementById('employeesBody');
+  if (!tbody) return;
+  tbody.innerHTML = "";
+  if (employees.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:28px 0">No hay empleados.</td></tr>`;
+    updateTaskEmployeeSelect();
+    return;
+  }
   employees.forEach((emp, idx) => {
     const salary = (parseFloat(emp.hourly) || 0) * (parseFloat(emp.hoursMonth) || 0);
     const ss = salary * (settings.ssRate || 0);
     const total = salary + ss;
     tbody.innerHTML += `<tr>
-<td>${emp.name}</td>
-<td>${emp.position}</td>
-<td>${emp.shift || ''}</td>
-<td>${parseFloat(emp.hourly).toFixed(2)}</td>
-<td>${parseFloat(emp.hoursMonth).toFixed(1)}</td>
-<td>${total.toFixed(2)} €</td>
-...
-</tr>`;
+      <td>${emp.name}</td>
+      <td>${emp.position}</td>
+      <td>${parseFloat(emp.hourly).toFixed(2)}</td>
+      <td>${parseFloat(emp.hoursMonth).toFixed(1)}</td>
+      <td>${total.toFixed(2)} €</td>
+      <td><button onclick="openTasksFor('${emp.name}')" class="btn-small">Ver</button></td>
+      <td><button onclick="editEmployee(${idx})" class="btn-small">Editar</button> 
+      <button onclick="deleteEmployee(${idx})" class="btn-small danger">Borrar</button></td>
+    </tr>`;
   });
-  updateTaskEmployeeSelect(); renderStaffIndicators(); saveData();
+  updateTaskEmployeeSelect();
+  renderStaffIndicators();
+  saveData();
 }
+
 document.getElementById('employeeForm').onsubmit = function(e){
-  e.preventDefault(); const f = e.target;
-  const emp = { name: f.name.value.trim(), role: f.role.value, position: f.position.value, shift: f.shift.value, hourly: parseFloat(f.hourly.value), hoursMonth: parseFloat(f.hoursMonth.value) };
+  e.preventDefault();
+  const f = e.target;
+  const emp = { 
+    name: f.name.value.trim(), 
+    position: f.position.value, 
+    hourly: parseFloat(f.hourly.value), 
+    hoursMonth: parseFloat(f.hoursMonth.value) 
+  };
   if (!emp.name) return;
-  employees.push(emp); saveData(); f.reset(); renderEmployeesTable(); refreshDashboard();
+  employees.push(emp);
+  saveData();
+  f.reset();
+  renderEmployeesTable();
+  refreshDashboard();
 };
 function editEmployee(idx) { const emp = employees[idx]; if (!emp) return; const name = prompt("Nombre:", emp.name); if (!name) return; const hourly = parseFloat(prompt("€/hora:", emp.hourly)); if (isNaN(hourly)) return; const hoursMonth = parseFloat(prompt("Horas mes:", emp.hoursMonth)); if (isNaN(hoursMonth)) return; emp.name = name; emp.hourly = hourly; emp.hoursMonth = hoursMonth; saveData(); renderEmployeesTable(); refreshDashboard(); }
 function deleteEmployee(idx) { if (!confirm("¿Borrar empleado?")) return; const name = employees[idx].name; employees.splice(idx,1); tasks = tasks.filter(t => t.employee !== name); saveData(); renderEmployeesTable(); renderTasksBoard(); refreshDashboard(); }
