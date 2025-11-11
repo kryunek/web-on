@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Reservas - Restaurante</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- HERO / RESERVA DESTACADA -->
+  <header style="background:linear-gradient(90deg, rgba(239,68,68,0.06), rgba(249,115,22,0.04)); padding:36px 18px; text-align:center;">
+    <h1 style="font-size:2.2rem;margin:0 0 8px;color:var(--text);">Reserva tu mesa ahora</h1>
+    <p style="margin:0 0 18px;color:var(--muted);max-width:760px;margin-left:auto;margin-right:auto;">
+      Reserva online en segundos. Selecciona fecha, hora y número de comensales. Si eres personal del restaurante, pulsa "Acceder panel" para gestionar reservas.
+    </p>
+    <div style="display:flex;gap:12px;justify-content:center;">
+      <button id="hero-reserve-btn" class="btn-gold" style="font-size:1.05rem;padding:14px 18px;">Reservar ahora</button>
+      <button id="access-panel-btn" class="btn-small" style="font-size:1.05rem;padding:14px 18px;">Acceder panel</button>
+    </div>
+  </header>
+
+  <!-- PUBLIC RESERVE MODAL (same as before) -->
+  <div id="public-reservation-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);align-items:center;justify-content:center;z-index:3000;padding:18px;">
+    <div style="background:#fff;padding:18px;border-radius:12px;max-width:520px;width:100%;">
+      <h3 style="margin-top:0">Reserva - Público</h3>
+      <form id="publicReservationForm" class="form-inline" style="flex-direction:column;gap:10px;">
+        <input name="name" type="text" placeholder="Nombre" required />
+        <input name="phone" type="tel" placeholder="Teléfono" required />
+        <input name="email" type="email" placeholder="Email (opcional)" />
+        <div style="display:flex;gap:8px;">
+          <input name="date" type="date" required />
+          <input name="time" type="time" required />
+          <input name="pax" type="number" min="1" value="2" style="width:110px" />
+        </div>
+        <textarea name="comments" placeholder="Comentarios (alergias, mesa...)" rows="3" style="min-width:100%"></textarea>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px;">
+          <button type="button" id="public-reserve-cancel" class="btn-small">Cancelar</button>
+          <button type="submit" class="btn-gold">Enviar reserva</button>
+        </div>
+        <div id="public-reserve-msg" style="color:var(--muted);margin-top:6px"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- LOGIN SCREEN (modal-like) -->
+  <div id="login-screen" class="login-screen" style="display:none;">
+    <form id="login-form" class="login-form">
+      <div class="login-logo">
+        <img src="logo.png" alt="Logo Restaurante" style="width: 56px; margin-bottom: 8px;">
+      </div>
+      <h2 class="section-title">Iniciar sesión (Admin)</h2>
+      <input id="login-email" name="user" type="email" placeholder="Email" autocomplete="username" required />
+      <input id="login-pass" name="pass" type="password" placeholder="Contraseña" autocomplete="current-password" required />
+      <button id="login-btn" type="submit" class="btn-gold">Entrar</button>
+      <div id="login-error" class="login-error"></div>
+    </form>
+  </div>
+
+  <!-- APP ROOT (panel) hidden until login -->
+  <div id="app-root" style="display:none;margin-top:18px;">
+    <!-- simplified panel header -->
+    <div style="padding:18px;">
+      <h2>Panel administrativo</h2>
+      <p style="color:var(--muted)">Accede a Reservas → gestionar estados y ver nueva actividad.</p>
+      <button id="logout-btn" class="logout-btn-fixed" style="position:static;margin-top:10px;">Cerrar sesión</button>
+    </div>
+
+    <!-- Reservations section (table) -->
+    <section id="reservations-section" style="display:none;padding:18px;">
+      <h3>Reservas</h3>
+      <div style="margin-bottom:10px;">
+        <select id="reservations-filter">
+          <option value="all">Todas</option>
+          <option value="pending">Pendientes</option>
+          <option value="confirmed">Confirmadas</option>
+          <option value="cancelled">Canceladas</option>
+          <option value="completed">Completadas</option>
+        </select>
+      </div>
+      <div class="table-container">
+        <table id="reservationsTable">
+          <thead>
+            <tr>
+              <th>Fecha</th><th>Hora</th><th>Nombre</th><th>Pax</th><th>Contacto</th><th>Estado</th><th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="reservationsBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <!-- scripts -->
+  <script type="module" src="./firebase_init.js"></script>
+  <script type="module" src="./app_reservas_firebase.js"></script>
+  <script type="module" src="./reservations_ui.js"></script>
+  <script src="./app.js" defer></script>
+</body>
+</html>
