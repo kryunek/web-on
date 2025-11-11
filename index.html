@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Gestión Rentabilidad | Restaurante</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <button id="access-panel-btn-fixed" class="btn-small" style="position:fixed;top:18px;right:18px;z-index:10001;">Acceder panel</button>
+
+
+  <!-- LOADER -->
+  <div id="loader" class="loader-bg">
+    <div class="loader-logo">
+      <img src="logo.png" alt="Logo Restaurante" style="width: 58px; margin-bottom: 8px;">
+    </div>
+    <div class="loader-title">Cargando app...</div>
+  </div>
+
+  <!-- LOGIN -->
+  <div id="login-screen" class="login-screen" style="display:none;">
+    <form id="login-form" class="login-form">
+      <div class="login-logo">
+        <img src="logo.png" alt="Logo Restaurante" style="width: 56px; margin-bottom: 8px;">
+      </div>
+      <h2 class="section-title">Iniciar sesión</h2>
+      <input name="email" type="email" placeholder="Correo electrónico" autocomplete="email" required autocomplete="username" required />
+      <input name="pass" type="password" placeholder="Contraseña" autocomplete="current-password" required autocomplete="current-password" required />
+      <button type="submit" class="btn-gold">Entrar</button>
+      <div id="login-error" class="login-error"></div>
+    </form>
+  </div>
+
+  <!-- APP -->
+  <div id="app-root" style="display:none;">
+    <div class="flex-container">
+
+      <!-- SIDEBAR -->
+      <aside id="sidebar" class="sidebar">
+        <div class="sidebar-logo-wrap"><img src="logo.png" alt="Logo Restaurante" class="sidebar-logo-img"></div>
+        <h1 class="sidebar-title">Mi Restaurante</h1>
+
+        <nav>
+          <ul style="flex:1;">
+            <li id="tab-dashboard" class="sidebar-item active">Dashboard</li>
+            <li id="tab-sales" class="sidebar-item">Ventas</li>
+            <li id="tab-escandallo" class="sidebar-item">Escandallo</li>
+             <li id="tab-reservas" class="sidebar-item">Reservas</li>
+
+            <div class="sidebar-sep"></div>
+            <div class="sidebar-section-title">PERSONAL</div>
+            <li id="tab-staff" class="sidebar-item">Empleados</li>
+            <li id="tab-tasks" class="sidebar-item">Tareas</li>
+
+            <div class="sidebar-sep"></div>
+            <div class="sidebar-section-title">PROVEEDORES</div>
+            <li id="tab-providers" class="sidebar-item">Proveedores</li>
+            <li id="tab-orders" class="sidebar-item">Pedidos / Compras</li>
+            <li id="tab-products" class="sidebar-item">Productos de Proveedores</li>
+          </ul>
+        </nav>
+      </aside>
+
+      <!-- CONTENIDO -->
+      <main id="main-content" class="main-content">
+
+        <!-- DASHBOARD -->
+        <section id="dashboard-section">
+          <div class="kpis">
+            <div class="kpi-card">
+              <span class="kpi-icon"><svg class="kpi-svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <div>
+                <div class="kpi-label">Beneficio medio</div>
+                <div id="avgMargin" class="kpi-value">0%</div>
+              </div>
+            </div>
+
+            <div class="kpi-card">
+              <span class="kpi-icon"><svg class="kpi-svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0zM12 9v4M12 17h.01" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <div>
+                <div class="kpi-label">Platos no rentables</div>
+                <div id="nonProfitable" class="kpi-value">0</div>
+              </div>
+            </div>
+
+            <div class="kpi-card">
+              <span class="kpi-icon"><svg class="kpi-svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 17.27L18.18 21l-1.64-7L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" stroke="currentColor" stroke-width="0.8" fill="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <div>
+                <div class="kpi-label">Platos estrella</div>
+                <div id="stars" class="kpi-value">0</div>
+              </div>
+            </div>
+
+            <div class="kpi-card">
+              <span class="kpi-icon"><svg class="kpi-svg" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 12c2.7 0 4-1.6 4-4s-1.3-4-4-4-4 1.6-4 4 1.3 4 4 4zm0 2c-3.3 0-10 1.7-10 5v1h20v-1c0-3.3-6.7-5-10-5z" fill="currentColor"/></svg></span>
+              <div>
+                <div class="kpi-label">Coste personal mensual</div>
+                <div id="staffCost" class="kpi-value">0 €</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <h3 class="section-subtitle">Comparativa de rentabilidad</h3>
+            <canvas id="profitChart" height="120"></canvas>
+          </div>
+
+          <div class="chart-card">
+            <h3 class="section-subtitle">Alertas y stock bajo</h3>
+            <div id="stockAlerts">Sin alertas.</div>
+          </div>
+        </section>
+
+      
+        <!-- VENTAS -->
+        <section id="sales-section" style="display: none;">
+          <div class="dashboard-header">
+            <h2 class="section-title">Ventas</h2>
+          </div>
+          <form id="salesForm" class="form-inline">
+            <input name="date" type="date" required />
+            <select name="dish" required></select>
+            <input name="units" type="number" placeholder="Unidades" min="1" required />
+            <button type="submit" class="btn-gold">Añadir Venta</button>
+          </form>
+
+          <div class="sales-header">
+            <label for="month-select">Mes:</label>
+            <select id="month-select"></select>
+          </div>
+
+          <div class="table-container">
+            <table id="salesTable">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Plato</th>
+                  <th>Unidades Vendidas</th>
+                  <th>Ingresos (€)</th>
+                </tr>
+              </thead>
+              <tbody id="salesBody"></tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="2" class="highlight-cell">TOTAL MES</td>
+                  <td id="totalUnits"></td>
+                  <td id="totalRevenue"></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <div class="chart-card">
+            <h3 class="section-subtitle">Comparativa mensual de ventas</h3>
+            <canvas id="salesChart" height="120"></canvas>
+          </div>
+        </section>
+
+        <!-- GASTOS FIJOS -->
+        <section id="expenses-section" style="display:none;">
+          <div class="dashboard-header">
+            <h2 class="section-title">Gastos Fijos Mensuales</h2>
+          </div>
+          <form id="expenseForm" class="form-inline">
+            <input type="month" name="month" required />
+            <input name="type" type="text" placeholder="Tipo de gasto (Alquiler, Sueldos...)" required />
+            <input name="amount" type="number" placeholder="Cantidad (€)" min="0" step="0.01" required />
+            <button type="submit" class="btn-gold">Añadir Gasto</button>
+          </form>
+          <div class="table-container">
+            <table id="expensesTable">
+              <thead>
+                <tr>
+                  <th>Mes</th>
+                  <th>Concepto</th>
+                  <th>Cantidad (€)</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="expensesBody"></tbody>
+            </table>
+          </div>
+          <div class="chart-card">
+            <h3 class="section-subtitle">Beneficio neto mensual (Beneficio - Gastos)</h3>
+            <canvas id="netProfitChart" height="120"></canvas>
+          </div>
+        </section>
+
+        <!-- ESCANDALLO -->
+
+<section id="escandallo-section" style="display: none;">
+  <div class="dashboard-header">
+    <h2 class="section-title">Escandallo de platos</h2>
+  </div>
+
+  <div class="escandallo-grid">
+    <!-- IZQUIERDA: crear plato + formulario de ingredientes + tabla -->
+    <div class="esc-left">
+      <div class="card">
+        <h3 class="section-subtitle">Crear / Seleccionar plato</h3>
+        <div class="form-inline">
+          <input id="new-dish-name" type="text" placeholder="Nombre del nuevo plato (ej. Lasaña)" />
+          <button id="create-dish-btn" class="btn-gold">Crear plato</button>
+          <label style="margin-left:12px;">Margen %:
+            <input id="escandallo-margin" type="number" min="0" max="500" step="1" value="40" style="width:80px;margin-left:6px;" />
+          </label>
+        </div>
+        <div style="margin-top:10px;">
+          <form id="escandalloForm" class="form-inline">
+            <select name="dish" id="escandallo-dish-select" required></select>
+          </form>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px;">
+        <h3 class="section-subtitle">Añadir ingrediente</h3>
+        <form id="ingredientForm" class="form-inline">
+          <select name="product" id="ingredient-product-select" required></select>
+          <input name="quantity" type="number" placeholder="Cantidad" min="0.001" step="0.001" required />
+          <input name="unit" type="text" id="ingredient-unit" placeholder="Unidad" disabled />
+          <input name="unitCost" type="number" id="ingredient-unitCost" placeholder="Precio unitario (€)" disabled />
+          <button type="submit" class="btn-gold">Añadir ingrediente</button>
+        </form>
+      </div>
+
+      <div class="card" style="margin-top:12px;">
+        <h3 class="section-subtitle">Ingredientes</h3>
+        <div class="table-container">
+          <table id="escandalloTable">
+            <thead>
+              <tr>
+                <th>Ingrediente</th>
+                <th>Cantidad</th>
+                <th>Unidad</th>
+                <th>Precio unitario (€)</th>
+                <th>Coste (€)</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="escandalloBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- DERECHA: resumen, desglose de precios y acciones rápidas -->
+    <aside class="esc-right">
+      <div class="card price-card">
+        <h3 class="section-subtitle">Resumen del plato</h3>
+        <div id="escandallo-summary" class="summary-text">Selecciona un plato para ver su escandallo y precio.</div>
+      </div>
+
+      <div class="card quick-actions" style="margin-top:12px;">
+        <h3 class="section-subtitle">Acciones rápidas</h3>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <button id="apply-margin-btn" class="btn-small">Aplicar margen al plato</button>
+          <button id="recalculate-cost-btn" class="btn-small">Recalcular coste</button> 
+        </div>
+      </div>
+    </aside>
+  </div>
+</section>
+
+        <!-- PERSONAL: EMPLEADOS -->
+        <section id="staff-section" style="display:none;">
+          <div class="dashboard-header">
+            <h2 class="section-title">Personal del Restaurante</h2>
+          </div>
+
+<form id="employeeForm" class="form-inline">
+  <input name="name" type="text" placeholder="Nombre" required />
+  <select name="position" required>
+    <option value="Cocinero/a">Cocinero/a</option>
+    <option value="Jefe/a de cocina">Jefe/a de cocina</option>
+    <option value="Ayudante de cocina">Ayudante de cocina</option>
+    <option value="Camarero/a">Camarero/a</option>
+    <option value="Encargado/a de sala">Encargado/a de sala</option>
+    <option value="Lavaplatos">Lavaplatos</option>
+  </select>
+  <input name="hourly" type="number" placeholder="€/h" step="0.01" required />
+  <input name="hoursMonth" type="number" placeholder="Horas/mes" step="0.1" required />
+  <button type="submit" class="btn-gold">Añadir</button>
+</form>
+
+          <div class="table-container">
+            <table id="employeesTable">
+              <thead>
+  <tr>
+    <th>Nombre</th>
+    <th>Puesto</th>
+    <th>€/h</th>
+    <th>Horas/mes</th>
+    <th>Coste total</th>
+    <th>Tareas</th>
+    <th>Acciones</th>
+  </tr>
+</thead>
+              <tbody id="employeesBody"></tbody>
+            </table>
+          </div>
+
+          <div class="staff-indicators">
+            <p>Total horas mes: <span id="totalHours">0</span></p>
+            <p>Coste laboral total (incl. SS): <span id="totalLabourCost">0 €</span></p>
+            <label>Seguridad Social (%) <input class="btn-hola" id="ssRate" type="number" min="0" max="100" step="1" /> </label>
+          </div>
+        </section>
+        
+        <section id="reservas-section" style="display:none;">
+  <div class="dashboard-header">
+    <h2 class="section-title"> </h2>
+  </div>
+  <div id="reservations-placeholder"></div>
+</section>
+        
+        <!-- PERSONAL: TAREAS (Trello-like) -->
+        <section id="tasks-section" style="display:none;">
+          <div class="dashboard-header">
+            <h2 class="section-title">Tareas diarias</h2>
+          </div>
+
+          <div class="task-controls form-inline">
+            <select id="task-employee-select"></select>
+            <input id="task-title" type="text" placeholder="Tarea (ej. Montar terraza)" />
+            <input id="task-date" type="date" />
+            <input id="task-time" type="time" />
+            <button id="assignTaskBtn" class="btn-gold">Asignar tarea</button>
+          </div>
+
+          <div id="tasks-board" class="tasks-board">
+            <!-- Se generan columnas por empleado -->
+          </div>
+        </section>
+
+        <!-- PROVEEDORES -->
+        <section id="providers-section" style="display:none;">
+          <div class="dashboard-header">
+            <h2 class="section-title">Proveedores</h2>
+          </div>
+
+          <form id="providerForm" class="form-inline">
+            <input name="name" type="text" placeholder="Nombre proveedor" required />
+            <input name="type" type="text" placeholder="Tipo (frescos, bebidas...)" />
+            <input name="contact" type="text" placeholder="Tel / Email" />
+            <input name="days" type="text" placeholder="Días de entrega (L / X / V)" />
+            <button type="submit" class="btn-gold">Añadir Proveedor</button>
+          </form>
+
+          <div class="table-container">
+            <table id="providersTable">
+              <thead>
+                <tr>
+                  <th>Proveedor</th>
+                  <th>Tipo</th>
+                  <th>Contacto</th>
+                  <th>Días</th>
+                  <th>Stock total</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="providersBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- PEDIDOS / COMPRAS -->
+        <section id="orders-section" style="display:none;">
+          <div class="dashboard-header">
+            <h2 class="section-title">Pedidos / Compras</h2>
+          </div>
+
+<form id="orderForm" class="form-inline">
+  <input name="date" type="date" required />
+  <select name="provider" id="order-provider-select" required></select>
+  <select name="product" id="order-product-select" required></select>
+  <input name="quantity" type="number" placeholder="Cantidad" min="0.001" step="0.001" required />
+  <input name="unit" type="text" id="order-unit" placeholder="Unidad" disabled />
+  <input name="price" type="number" id="order-price" placeholder="Precio total (€)" min="0.01" step="0.01" readonly />
+  <button type="submit" class="btn-gold">Registrar Pedido</button>
+</form>
+          </form>
+
+          <div class="table-container">
+            <table id="ordersTable">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Proveedor</th>
+                  <th>Producto</th>
+                  <th>Cantidad</th>
+                  <th>Precio (€)</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="ordersBody"></tbody>
+            </table>
+          </div>
+
+          <div class="orders-summary">
+            <h4>Gastos por proveedor (últimos meses)</h4>
+            <div id="ordersSummary"></div>
+          </div>
+        </section>
+<section id="products-section" style="display:none;">
+  <div class="dashboard-header">
+    <h2 class="section-title">Productos por Proveedor</h2>
+  </div>
+
+  <form id="productForm" class="form-inline">
+    <select name="provider" id="product-provider-select" required></select>
+    <input name="name" type="text" placeholder="Nombre del producto" required />
+    <input name="unit" type="text" placeholder="Unidad (kg, L, ud...)" required />
+    <input name="price" type="number" placeholder="Precio por unidad (€)" min="0.01" step="0.01" required />
+    <button type="submit" class="btn-gold">Añadir Producto</button>
+  </form>
+
+  <div class="table-container">
+    <table id="productsTable">
+      <thead>
+        <tr>
+          <th>Proveedor</th>
+          <th>Producto</th>
+          <th>Unidad</th>
+          <th>Precio (€)</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="productsBody"></tbody>
+    </table>
+  </div>
+</section>
+  </div>
+
+  <!-- BOTÓN CERRAR SESIÓN FIJO -->
+  <button id="logout-btn" class="logout-btn-fixed" title="Log out">Cerrar sesión</button>
+
+  <script type="module" src="./firebase_init.js"></script>
+  <script type="module" src="./app_reservas_firebase.js"></script>\n  <script type="module" src="./auth_bridge.js"></script>
+  <script type="module" src="./reservations_ui.js"></script>
+  <script src="./app.js" defer></script>
+<script>
+(function(){
+  const btn = document.getElementById('sidebar-toggle');
+  const sidebar = document.getElementById('sidebar');
+  const main = document.getElementById('main-content');
+  if(!btn || !sidebar || !main) return;
+  btn.addEventListener('click', function(){
+    const collapsed = sidebar.classList.toggle('collapsed');
+    btn.setAttribute('aria-expanded', String(!collapsed));
+    if(collapsed){
+      sidebar.style.width = '72px';
+      main.style.marginLeft = '72px';
+    } else {
+      sidebar.style.width = '260px';
+      main.style.marginLeft = '260px';
+    }
+  });
+})();
+</script>
+</body>
+</html>
